@@ -1,0 +1,1 @@
+Aplicação web educacional com integração de IA, que gera conteúdos de estudo personalizados e questionários baseados no tema escolhido pelo usuário.
