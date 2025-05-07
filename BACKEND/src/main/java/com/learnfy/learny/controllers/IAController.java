@@ -18,8 +18,8 @@ public class IAController {
     private final IAService iaService;
 
     @PostMapping("/generate")
-    public ResponseEntity<StudyContent> gerarConteudo(@RequestBody TopicRequest request) {
-        StudyContent resultado = iaService.generateContent(request.getTopic());
-        return ResponseEntity.ok(resultado);
+    public ResponseEntity<StudyContent> generateContent(@RequestBody TopicRequest request) {
+        StudyContent result = iaService.generateContent(request.getTopic());
+        return ResponseEntity.ok(result);
     }
 }

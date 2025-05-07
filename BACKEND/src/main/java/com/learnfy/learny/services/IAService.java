@@ -17,11 +17,10 @@ public class IAService {
             .defaultHeader("Authorization", "Bearer SUA_CHAVE_AQUI")
             .build();
 
-    public StudyContent generateContent(String topico) {
-        String prompt = "Explique de forma educativa o seguinte tema: " + topico +
+    public StudyContent generateContent(String topic) {
+        String prompt = "Explique de forma educativa o seguinte tema: " + topic +
                 ". Ao final, crie 5 perguntas de múltipla escolha com gabarito.";
 
-        // Corpo da requisição
         Map<String, Object> request = Map.of(
                 "model", "gpt-3.5-turbo",
                 "messages", List.of(
@@ -30,19 +29,17 @@ public class IAService {
                 "temperature", 0.7
         );
 
-        // Envia para OpenAI
-        String resposta = webClient.post()
+        String response = webClient.post()
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
 
-        // Aqui você vai fazer o parsing da resposta e salvar no Mongo
-        StudyContent conteudo = new StudyContent();
-        conteudo.setTopic(topico);
-        conteudo.setContent(resposta); // parsear de forma mais elaborada se quiser separar conteúdo do quiz
-        conteudo.setQuiz(""); // opcional
+        StudyContent content = new StudyContent();
+        content.setTopic(topic);
+        content.setContent(response);
+        content.setQuiz("");
 
-        return conteudo;
+        return content;
     }
 }
