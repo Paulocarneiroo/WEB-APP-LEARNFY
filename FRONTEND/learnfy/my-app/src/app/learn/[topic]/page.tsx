@@ -24,26 +24,73 @@ export default function LearnPage() {
       setError(null)
 
       try {
-        // Fazendo requisição diretamente ao backend externo
-        // Assumindo que o backend espera o tópico como parâmetro na URL ou no corpo da requisição
-        // Ajuste conforme necessário para seu backend específico
-        const response = await fetch(`http://localhost:8080/content/1`, {
-          method: "POST",
+        console.log("Iniciando requisição para o backend...")
+
+        // Acessando diretamente o endpoint correto
+        const encodedTopic = encodeURIComponent(topic)
+        const backendUrl = `http://localhost:8080/content/1?topic=${encodedTopic}`
+
+        console.log(`Tentando acessar: ${backendUrl}`)
+
+        const response = await fetch(backendUrl, {
+          method: "GET",
           headers: {
-            "Content-Type": "application/json",
+            Accept: "application/json",
+            // Adicionando cabeçalhos CORS para ajudar com problemas de cross-origin
+            Origin: window.location.origin,
           },
-          body: JSON.stringify({ topic }),
         })
 
+        console.log(`Resposta recebida. Status: ${response.status}`)
+
         if (!response.ok) {
-          throw new Error(`Falha ao gerar conteúdo (${response.status}). Tente novamente.`)
+          let errorBody = ""
+          try {
+            errorBody = await response.text()
+            console.error("Corpo da resposta de erro:", errorBody)
+          } catch (e) {
+            console.error("Não foi possível ler o corpo da resposta de erro")
+          }
+
+          let errorMessage = "Falha ao buscar conteúdo. Tente novamente."
+
+          switch (response.status) {
+            case 400:
+              errorMessage = "Requisição inválida. Verifique o tópico e tente novamente."
+              break
+            case 404:
+              errorMessage = "Conteúdo não encontrado para este tópico."
+              break
+            case 405:
+              errorMessage = "Método não permitido. O servidor não aceita este tipo de requisição."
+              break
+            case 500:
+              errorMessage = "Erro interno do servidor. Tente novamente mais tarde."
+              break
+          }
+
+          throw new Error(`${errorMessage} (Status: ${response.status})${errorBody ? ` - ${errorBody}` : ""}`)
         }
 
+        console.log("Analisando resposta JSON...")
         const data = await response.json()
+        console.log("Dados recebidos:", data)
+
+        if (!data || typeof data !== "object") {
+          throw new Error("Formato de resposta inválido do servidor")
+        }
+
         setContent(data)
       } catch (err) {
-        console.error("Erro ao buscar conteúdo:", err)
-        setError(err instanceof Error ? err.message : "Ocorreu um erro inesperado")
+        console.error("Erro detalhado:", err)
+
+        if (err instanceof TypeError && err.message.includes("fetch")) {
+          setError(
+            "Não foi possível conectar ao servidor. Verifique se o backend está rodando em http://localhost:8080.",
+          )
+        } else {
+          setError(err instanceof Error ? err.message : "Ocorreu um erro inesperado")
+        }
       } finally {
         setIsLoading(false)
       }
@@ -51,6 +98,59 @@ export default function LearnPage() {
 
     fetchContent()
   }, [topic])
+
+  // Função para tentar com parâmetros diferentes
+  const retryWithDifferentParams = async () => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      console.log("Tentando com parâmetros diferentes...")
+
+      // Tentativa com o tópico no caminho da URL em vez de query parameter
+      const encodedTopic = encodeURIComponent(topic)
+      const alternativeUrl = `http://localhost:8080/content/${encodedTopic}`
+      console.log(`Tentando acessar: ${alternativeUrl}`)
+
+      const response = await fetch(alternativeUrl, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`Falha ao buscar conteúdo (Status: ${response.status})`)
+      }
+
+      const data = await response.json()
+      setContent(data)
+    } catch (err) {
+      console.error("Erro na abordagem alternativa:", err)
+      setError(`Tentativa alternativa falhou: ${err instanceof Error ? err.message : "Erro desconhecido"}`)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Função para simular conteúdo para testes
+  const loadMockContent = () => {
+    setIsLoading(true)
+    setError(null)
+
+    // Dados de exemplo para teste
+    const mockData: StudyContent = {
+      id: "1",
+      topic: topic,
+      content: `<h1>Conteúdo sobre ${topic}</h1><p>Este é um conteúdo de exemplo para testes. Em um ambiente real, este conteúdo seria gerado pelo backend.</p><h2>Tópicos principais</h2><ul><li>Primeiro tópico</li><li>Segundo tópico</li><li>Terceiro tópico</li></ul>`,
+      quiz: `<h2>Quiz sobre ${topic}</h2><p>1. Qual é a principal característica de ${topic}?</p><p>2. Quais são os benefícios de estudar ${topic}?</p><p>3. Como ${topic} se relaciona com outras áreas de conhecimento?</p>`,
+    }
+
+    setTimeout(() => {
+      setContent(mockData)
+      setIsLoading(false)
+    }, 1000)
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-emerald-50 to-white">
@@ -84,7 +184,7 @@ export default function LearnPage() {
           <div className="p-6 bg-red-50 border border-red-200 rounded-lg text-red-600">
             <h3 className="font-bold mb-2">Erro ao carregar o conteúdo</h3>
             <p>{error}</p>
-            <div className="mt-4 flex gap-4">
+            <div className="mt-4 flex flex-wrap gap-4">
               <Button
                 onClick={() => window.location.reload()}
                 variant="outline"
@@ -92,9 +192,30 @@ export default function LearnPage() {
               >
                 Tentar novamente
               </Button>
+              <Button
+                onClick={retryWithDifferentParams}
+                variant="outline"
+                className="border-amber-200 text-amber-600 hover:bg-amber-50"
+              >
+                Tentar formato alternativo
+              </Button>
+              <Button
+                onClick={loadMockContent}
+                variant="outline"
+                className="border-blue-200 text-blue-600 hover:bg-blue-50"
+              >
+                Carregar conteúdo de exemplo
+              </Button>
               <Link href="/" className="inline-block px-4 py-2 bg-emerald-600 text-white rounded-md">
                 Voltar para a página inicial
               </Link>
+            </div>
+            <div className="mt-4 p-3 bg-gray-50 rounded text-gray-700 text-sm">
+              <p className="font-medium">Informações de depuração:</p>
+              <p>Endpoint: http://localhost:8080/content/1</p>
+              <p>Tópico: {topic}</p>
+              <p>Método: GET</p>
+              <p>Navegador: {typeof window !== "undefined" ? window.navigator.userAgent : "N/A"}</p>
             </div>
           </div>
         )}

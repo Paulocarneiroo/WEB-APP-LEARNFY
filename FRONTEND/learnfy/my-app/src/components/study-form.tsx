@@ -6,19 +6,18 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
+import { useRouter } from "next/navigation"
 
-interface StudyFormProps {
-  onSubmit: (topic: string) => Promise<void>
-  isLoading: boolean
-}
-
-export function StudyForm({ onSubmit, isLoading }: StudyFormProps) {
+// Adicione o useRouter no início do componente
+export function StudyForm({ isLoading }: { isLoading: boolean }) {
   const [topic, setTopic] = useState("")
+  const router = useRouter()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (topic.trim()) {
-      onSubmit(topic)
+      // Redirecionar para a página de aprendizado com o tópico na URL
+      router.push(`/learn/${encodeURIComponent(topic)}`)
     }
   }
 
