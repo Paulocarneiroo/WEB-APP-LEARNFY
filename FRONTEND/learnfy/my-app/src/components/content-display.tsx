@@ -1,15 +1,34 @@
 import type { StudyContent } from "@/types/study-content"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useEffect, useState } from "react"
 
 interface ContentDisplayProps {
   content: StudyContent
 }
 
 export function ContentDisplay({ content }: ContentDisplayProps) {
+  const [typedText, setTypedText] = useState("")
+  const [charIndex, setCharIndex] = useState(0)
+
+  useEffect(() => {
+    if (content.detailedContent && charIndex < content.detailedContent.length) {
+      const timeout = setTimeout(() => {
+        setTypedText((prev) => prev + content.detailedContent[charIndex])
+        setCharIndex((prev) => prev + 1)
+      }, 20)
+      return () => clearTimeout(timeout)
+    }
+  }, [charIndex, content.detailedContent])
+
+  useEffect(() => {
+    setTypedText("")
+    setCharIndex(0)
+  }, [content.detailedContent])
+
   return (
     <div className="mt-12">
-      <h2 className="text-3xl font-bold text-gray-800 mb-6">{content.title}</h2>
+      <h2 className="text-3xl font-bold text-gray-800 mb-6">{content.topic}</h2>
 
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
@@ -28,7 +47,7 @@ export function ContentDisplay({ content }: ContentDisplayProps) {
               <div className="prose max-w-none">
                 <p className="text-lg">{content.overview}</p>
 
-                {content.keyPoints && (
+                {content.keyPoints?.length > 0 && (
                   <>
                     <h3 className="text-xl font-medium mt-6 mb-3">Pontos-chave</h3>
                     <ul>
@@ -49,7 +68,14 @@ export function ContentDisplay({ content }: ContentDisplayProps) {
               <CardTitle>Conteúdo Detalhado</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: content.detailedContent }} />
+              <div className="prose max-w-none whitespace-pre-wrap">
+                {/* Exibe com digitação se possível, ou como HTML se for o caso */}
+                {content.detailedContent?.includes("<") ? (
+                  <div dangerouslySetInnerHTML={{ __html: content.detailedContent }} />
+                ) : (
+                  <>{typedText}</>
+                )}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -61,17 +87,20 @@ export function ContentDisplay({ content }: ContentDisplayProps) {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {content.exercises.map((exercise, index) => (
-                  <div key={index} className="p-4 border rounded-lg">
-                    <p className="font-medium mb-2">Exercício {index + 1}:</p>
-                    <p>{exercise.question}</p>
-
-                    <details className="mt-4">
-                      <summary className="cursor-pointer text-emerald-600 font-medium">Ver resposta</summary>
-                      <div className="mt-2 p-3 bg-gray-50 rounded">{exercise.answer}</div>
-                    </details>
-                  </div>
-                ))}
+                {content.exercises?.length > 0 ? (
+                  content.exercises.map((exercise, index) => (
+                    <div key={index} className="p-4 border rounded-lg">
+                      <p className="font-medium mb-2">Exercício {index + 1}:</p>
+                      <p>{exercise.question}</p>
+                      <details className="mt-4">
+                        <summary className="cursor-pointer text-emerald-600 font-medium">Ver resposta</summary>
+                        <div className="mt-2 p-3 bg-gray-50 rounded">{exercise.answer}</div>
+                      </details>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-600">Nenhum exercício disponível.</p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -84,18 +113,22 @@ export function ContentDisplay({ content }: ContentDisplayProps) {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {content.additionalResources.map((resource, index) => (
-                  <a
-                    key={index}
-                    href={resource.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <h3 className="font-medium text-emerald-600">{resource.title}</h3>
-                    <p className="text-sm text-gray-600 mt-1">{resource.description}</p>
-                  </a>
-                ))}
+                {content.additionalResources?.length > 0 ? (
+                  content.additionalResources.map((resource, index) => (
+                    <a
+                      key={index}
+                      href={resource.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <h3 className="font-medium text-emerald-600">{resource.title}</h3>
+                      <p className="text-sm text-gray-600 mt-1">{resource.description}</p>
+                    </a>
+                  ))
+                ) : (
+                  <p className="text-gray-600">Nenhum recurso adicional disponível.</p>
+                )}
               </div>
             </CardContent>
           </Card>

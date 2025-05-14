@@ -1,7 +1,15 @@
-// Atualizando a interface para o novo formato de resposta
 export interface StudyContent {
-  id: string
-  topic: string
-  content: string
-  quiz: string
+  topic: string;
+  overview: string;
+  keyPoints?: string[];
+  detailedContent?: string;
+  exercises?: {
+    question: string;
+    answer: string;
+  }[];
+  additionalResources?: {
+    url: string;
+    title: string;
+    description: string;
+  }[];
 }
