@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "./Navbar.css";
 
 const Navbar = () => {
@@ -7,8 +8,8 @@ const Navbar = () => {
         LearnFy
       </div>
       <div className="navbar-links">
-        <a href="#" className="nav-link">Entrar</a>
-        <a href="#" className="nav-link">Cadastrar</a>
+        <Link className="nav-link" to="/login">Entrar</Link>
+        <Link className="nav-link" to="/register">Cadastrar</Link>
       </div>
     </nav>
   );
