@@ -3,10 +3,17 @@ import { useSearchParams } from "react-router-dom";
 import { generateWithLLaMA } from "../services/api";
 import Navbar from "./NavBar";
 import "./ResultPage.css";
+import { useNavigate } from "react-router-dom";
 
 const ResultPage = () => {
   const [searchParams] = useSearchParams();
   const topic = searchParams.get("topic") || "";
+ 
+  const navigate = useNavigate();
+
+  const handleGenerateQuiz = () => {
+    navigate(`/quiz/?topic=${encodeURIComponent(topic)}`);
+  };
 
   const [content, setContent] = useState("");
   const [fullContent, setFullContent] = useState("");
@@ -54,6 +61,12 @@ const ResultPage = () => {
           <p className="typed-text">{content}</p>
         )}
       </div>
+      <button
+      onClick={handleGenerateQuiz}
+      className="mt-6 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition"
+>
+  Gerar Quiz
+</button>
     </>
   );
 };

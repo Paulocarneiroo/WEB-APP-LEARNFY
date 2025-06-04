@@ -9,6 +9,7 @@ const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<"success" | "error" | "">("");
   const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -20,12 +21,13 @@ const RegisterPage = () => {
         email,
         password,
       });
-
+      setMessageType("success");
       setMessage("Cadastro realizado com sucesso!");
       setTimeout(() => {
         navigate("/login");
       }, 1500);
     } catch (error: any) {
+      setMessageType("error");
       setMessage(
         error.response?.data?.message || "Erro ao registrar. Tente novamente."
       );
@@ -71,7 +73,12 @@ const RegisterPage = () => {
 
         <button type="submit">Cadastrar</button>
 
-        {message && <p className="erro">{message}</p>}
+        
+          {message && (
+            <p className={messageType === "success" ? "message-success" : "message-error"}>
+              {message}
+            </p>
+          )}
       </form>
     </div>
     </>

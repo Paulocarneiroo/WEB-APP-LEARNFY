@@ -1,23 +1,36 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import Navbar from "./NavBar";
 import "./LoginPage.css";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [erro, setErro] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Simples simulação de login
-    if (email === "teste@learnfy.com" && senha === "123456") {
-      setErro("");
-      navigate("/"); // redireciona para home
-    } else {
-      setErro("Email ou senha inválidos.");
+    try {
+      const response = await axios.post("http://localhost:8080/auth/login", {
+        email,
+        password
+      });
+
+      const token = response.data.token; // ou outro nome dependendo do backend
+      localStorage.setItem("token", token);
+
+
+      setError("");
+      navigate("/"); // Redireciona para home após login bem-sucedido
+    } catch (error: any) {
+      if (error.response && error.response.status === 403) {
+        setError("Usuário ou senha inválidos.");
+      } else {
+        setError("Erro ao tentar fazer login. Tente novamente.");
+      }
     }
   };
 
@@ -41,12 +54,12 @@ const LoginPage = () => {
           <input
             type="password"
             placeholder="Sua senha"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
 
-          {erro && <p className="erro">{erro}</p>}
+          {error && <p className="erro">{error}</p>}
 
           <button type="submit">Entrar</button>
         </form>
