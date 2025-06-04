@@ -3,14 +3,16 @@ import { useSearchParams } from "react-router-dom";
 import { generateWithLLaMA } from "../services/api";
 import Navbar from "./NavBar";
 import "./QuizPage.css";
+import ReactMarkdown from 'react-markdown';
 
 const QuizPage = () => {
   const [searchParams] = useSearchParams();
   const topic = searchParams.get("topic") || "";
-  
+
   const [contentQuiz, setContentQuiz] = useState("");
   const [fullContentQuiz, setFullContentQuiz] = useState(""); 
   const [loading, setLoading] = useState(true);
+  const [doneTyping, setDoneTyping] = useState(false);
 
   useEffect(() => {
     const fetchQuiz = async () => {
@@ -31,12 +33,14 @@ const QuizPage = () => {
   useEffect(() => {
     let index = 0;
     setContentQuiz("");
+    setDoneTyping(false);
     const interval = setInterval(() => {
       if (index < fullContentQuiz.length) {
         setContentQuiz((prev) => prev + fullContentQuiz[index]);
         index++;
       } else {
         clearInterval(interval);
+        setDoneTyping(true);
       }
     }, 25);
 
@@ -50,6 +54,10 @@ const QuizPage = () => {
         <h2 className="quiz-title">Quiz: {topic}</h2>
         {loading ? (
           <p className="quiz-loading">Carregando quiz...</p>
+        ) : doneTyping ? (
+          <div className="quiz-content markdown-body">
+            <ReactMarkdown>{fullContentQuiz}</ReactMarkdown>
+          </div>
         ) : (
           <div className="quiz-content">{contentQuiz}</div>
         )}
