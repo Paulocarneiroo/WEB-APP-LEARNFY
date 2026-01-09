@@ -1,195 +1,110 @@
-# 📘 LearnFy
+# LearnFy ✍️ 🤖
 
-**LearnFy** é uma aplicação educacional interativa que utiliza inteligência artificial para gerar conteúdos de estudo personalizados e questionários automáticos.  
-O usuário informa o tema que deseja aprender, e o sistema gera um texto educativo e um banco de questões baseado nesse conteúdo.
-
----
-
-## 🚀 Tecnologias Utilizadas
-
-### 🧠 Backend
-- **Spring Boot (Java 17+)**
-- **Spring Web**
-- **Spring Data JPA**
-- **MongoDB** (banco de dados NoSQL)
-- **Lombok**
-- **Cors Configuration** para integração com o frontend
-
-### 💻 Frontend
-- **React + TypeScript**
-- **Vite**
-- **TailwindCSS**
-- **Framer Motion** (animações)
-- **Axios** (requisições HTTP)
-- **React Router DOM**
+O **LearnFy**, um protótipo de aplicativo de aprendizagem que utiliza inteligência artificial rodando localmente com **Ollama** para gerar conteúdo educacional e quizzes de estudo.
 
 ---
 
-## 🧩 Arquitetura da Aplicação
+<p align="center">
+  <img src="docs/gif.gif" alt="Demonstração do Data Pipeline" width="800"/>
+</p>
 
-A arquitetura segue o modelo **Cliente-Servidor**, com comunicação via API REST:
+## 🚀 Visão Geral
+
+LearnFy é uma aplicação web focada em proporcionar um **ambiente de estudo interativo**, onde o usuário pode solicitar conteúdos sobre um tema e, com base nesses conteúdos, gerar **questionários inteligentes para estudo**. A aplicação frontend é construída com **React** e integrada com um backend que utiliza **Ollama** para rodar modelos de IA localmente.
+
+Este projeto é um protótipo que explora capacidades de IA **offline** com geração de conteúdo para apoio educacional.
+
+---
+
+## 📦 Funcionalidades
+
+* 💻 Interface responsiva em React
+* 📚 Tela inicial para entrada de tema de estudo
+* 🤖 Integração com IA (Ollama) via backend local
+* ✍️ Exibição de conteúdo gerado dinamicamente
+* 📊 Geração de quizzes com base no conteúdo gerado
+* 🚀 Fluxo completo de interação sem depender de APIs hospedadas na nuvem
+
+---
+
+## 🧠 Tecnologia Utilizada
+
+| Categoria   | Tecnologia               |
+| ----------- | ------------------------ |
+| Frontend    | React                    |
+| Build       | Vite                     |
+| Estilização | CSS, Tailwind (opcional) |
+| IA Local    | Ollama (via backend)     |
+| Integração  | API REST fetch           |
+
+---
+
+## 📁 Estrutura do Projeto
+
+A pasta principal do frontend `LEARNFY-FRONTED/` possui a seguinte organização típica:
 
 ```
-
-[Frontend React] ⇄ [API Spring Boot] ⇄ [MongoDB]
-
-````
-
-### Backend
-O backend simula uma IA que processa o tema enviado e retorna:
-- `content`: texto explicativo sobre o tema.
-- `quiz`: um conjunto de perguntas relacionadas ao conteúdo.
-
-#### Entidade principal:
-```java
-public class StudyContent {
-    private String id;
-    private String topic;
-    private String content;
-    private String quiz;
-}
-````
-
-#### Endpoints principais:
-
-| Método | Rota                 | Descrição                                           |
-| ------ | -------------------- | --------------------------------------------------- |
-| `GET`  | `/api/study/{topic}` | Retorna o conteúdo de estudo sobre o tema informado |
-| `POST` | `/api/study`         | Cria um novo registro de conteúdo de estudo         |
-
----
-
-### Frontend
-
-O frontend possui uma interface intuitiva e responsiva com três seções principais:
-
-* **Tela principal:** o usuário informa o tema que deseja aprender.
-* **Tela de aprendizado:** exibe o conteúdo gerado letra por letra (efeito de digitação).
-* **Tela de questionário:** gera perguntas baseadas no conteúdo estudado.
-
-#### Estrutura principal:
-
-```
-src/
-├── components/
-│   ├── LearnPage.tsx
-│   ├── QuizPage.tsx
-│   ├── MenuButton.tsx
-├── pages/
-│   ├── HomeScreen.tsx
-│   ├── LearnScreen.tsx
-│   ├── QuizScreen.tsx
-├── services/
-│   └── api.ts (configuração do Axios)
-└── App.tsx
+LEARNFY-FRONTED/
+├── public/                # Arquivos públicos estáticos
+├── src/                   # Código-fonte principal
+│   ├── components/        # Componentes React reutilizáveis
+│   ├── pages/             # Páginas e visões principais
+│   ├── services/          # Chamadas à API
+│   ├── styles/            # Estilos e tema
+│   ├── App.jsx            # Componente principal
+│   └── index.jsx          # Entry point
+├── .gitignore
+├── package.json
+├── vite.config.js
+└── README.md
 ```
 
-#### Exemplo de uso da API:
+Essa estrutura ajuda a separar lógica, apresentação e integração com facilidade.
 
-```ts
-const response = await axios.get(`http://localhost:8080/api/study/${topic}`);
-setContent(response.data.content);
+---
+
+## 🛠️ Pré-requisitos
+
+Antes de iniciar, certifique-se de ter as seguintes ferramentas instaladas:
+
+* Node.js (versão 18+)
+* Yarn
+* Ollama instalado e configurado localmente
+
+---
+
+## 💻 Como Rodar o Projeto
+
+1. Clone este repositório:
+
+```bash
+git clone https://github.com/Paulocarneiroo/WEB-APP-LEARNFY.git
 ```
 
----
+2. Acesse a pasta do frontend:
 
-## 🧠 Funcionalidades
+```bash
+cd WEB-APP-LEARNFY/FRONTEND/LEARNFY-FRONTED
+```
 
-✅ Geração automática de conteúdo educacional com IA (simulada no backend)
-✅ Exibição do texto com **animação de digitação**
-✅ Geração de **questionários automáticos** com base no conteúdo
-✅ Interface responsiva e amigável
-✅ Integração completa com backend Spring Boot + MongoDB
+3. Instale as dependências:
 
----
+```bash
+npm install
+# ou
+yarn install
+```
 
-## 📦 Como Executar o Projeto
+4. Inicie o servidor de desenvolvimento:
 
-### 🖥️ Backend (Spring Boot)
+```bash
+npm run dev
+# ou
+yarn dev
+```
 
-1. Clone o repositório:
+5. Abra o navegador no endereço:
 
-   ```bash
-   git clone https://github.com/seu-usuario/learnfy.git
-   cd learnfy/backend
-   ```
-
-2. Configure o banco MongoDB:
-
-   * Certifique-se de ter o MongoDB rodando localmente (porta padrão `27017`)
-   * Configure a URI no arquivo `application.properties`:
-
-     ```
-     spring.data.mongodb.uri=mongodb://localhost:27017/learnfy
-     ```
-
-3. Execute o backend:
-
-   ```bash
-   ./mvnw spring-boot:run
-   ```
-
-   O servidor iniciará em `http://localhost:8080`
-
----
-
-### 🌐 Frontend (React + Vite)
-
-1. Entre na pasta do frontend:
-
-   ```bash
-   cd learnfy/frontend
-   ```
-
-2. Instale as dependências:
-
-   ```bash
-   npm install
-   ```
-
-3. Execute o servidor de desenvolvimento:
-
-   ```bash
-   npm run dev
-   ```
-
-   A aplicação estará disponível em `http://localhost:5173`
-
----
-
-## 📸 Demonstração Visual
-
-### Tela Principal
-
-O usuário informa o tema que deseja aprender e clica em **"Aprender"**.
-
-### Geração do Conteúdo
-
-O texto é exibido **letra por letra** simulando uma IA escrevendo o conteúdo.
-
-### Questionário
-
-Após o texto, o usuário pode clicar em **"Gerar Questionário"** e testar seus conhecimentos.
-
----
-
-## 🧱 Padrões e Boas Práticas
-
-O projeto adota:
-
-* **Clean Code** (nomes claros, responsabilidade única, modularização)
-* **Separação entre camadas (Controller, Service, Repository)** no backend
-* **Componentização e Hooks** no frontend
-* **Padrões de Projeto:** uso de **Builder**, **Composite** e **Chain of Responsibility** (em partes do backend simulando a IA)
-
----
-
-## 🧑‍💻 Autor
-
-**Paulo Carneiro** <br/>
-🎓 Estudante de Ciência da Computação <br/>
-💡 Desenvolvedor de software <br/>
-📍 Brasil <br/>
-🔗 [LinkedIn](https://linkedin.com/in/paulocarneiro) • [GitHub](https://github.com/paulocarneiro) <br/>
-
----
+```
+http://localhost:5173
+```
